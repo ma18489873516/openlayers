@@ -40,7 +40,7 @@ function useMapMethodHook() {
 
 
     // 删除多个图层---删除图层既可以使用removeLayer方法, 亦可通过设置opacity/zIndex/Visible等属性控制其显隐
-    const removeMutiLayer = () => {
+    const removeMutiLayer = (map) => {
         let allLayer = map.getAllLayers()
         for (let i in allLayer) {
             if (allLayer[i].get('id') !== 'gaode_vector') {
@@ -51,22 +51,22 @@ function useMapMethodHook() {
     }
 
     // 获取地图尺寸
-    const getMapSize = () => {
+    const getMapSize = (map) => {
         let mapSize = map.getSize();
         console.log('获取地图尺寸', mapSize)
     }
 
 
     // 设置地图尺寸
-    const setMapSize = () => {
+    const setMapSize = (map) => {
         map.setSize([800, 200])
-        alert('设置地图尺寸')
+        console.log('设置地图尺寸')
         // updateMapSize()
     }
 
 
     // 更新地图尺寸
-    const updateMapSize = () => {
+    const updateMapSize = (map) => {
         map.updateSize();
 
         console.log('更新地图尺寸')
