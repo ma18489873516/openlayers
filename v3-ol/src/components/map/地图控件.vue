@@ -26,11 +26,6 @@ const initMap = () => {
     });
 }
 
-// 给地图注册事件
-const registerClickEvent = (map) => {
-
-}
-
 onMounted(() => {
     initMap();
     registerClickEvent()
