@@ -23,8 +23,27 @@ const initMap = () => {
     });
 }
 
+// 地图漫游
+const mapRoaming = (map) => {
+    /* 
+            1. 开启地图漫游就添加地图事件
+            2. 取消地图漫游就移除地图事件
+        */
+    map.on('click', (event) => {
+        // 获取点击位置坐标
+        const [lng, lat] = event.coordinate
+        // 漫游至点击位置
+        map.getView().animate({
+            center: [lng, lat],  // 中心点
+            zoom: 8,    // 缩放级别
+            duration: 1000,  // 持续时间，单位为毫秒
+        })
+    })
+}
+
 onMounted(() => {
     initMap();
+    mapRoaming(map)
 });
 </script>
 
