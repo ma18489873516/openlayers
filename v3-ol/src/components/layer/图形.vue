@@ -1,17 +1,28 @@
 <script setup>
 import { Map, View } from "ol";
+import TileLayer from "ol/layer/Tile";
+import XYZ from "ol/source/XYZ";
 import { defaults } from 'ol/interaction';
-import { gaode_vector } from "./hooks/map/layer.js";
-import { onMounted } from "vue";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
 import { Point, LineString, Polygon, Circle } from "ol/geom";
-import { commonStyle } from './utils/style/commonColor.js'
+import { Style, Fill, Circle as CircleStyle, Stroke } from 'ol/style'
+
+import { onMounted } from "vue";
 
 let map
-
 const initMap = () => {
+    const gaodeMap = new TileLayer({
+        id: "gaodeMap",
+        projection: 'EPSG:4326',
+        source: new XYZ({
+            title: "gaodeMap",
+            url: "https://wprd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}",
+            wrapX: true,
+            crossOrigin: "Anonymous",
+        }),
+    });
     const view = new View({
         projection: "EPSG:4326",
         center: [108.945951, 34.465262],
@@ -19,7 +30,7 @@ const initMap = () => {
     });
     map = new Map({
         target: "map",
-        layers: [gaode_vector],
+        layers: [gaodeMap],
         view: view,
         controls: [],
         interactions: defaults({
@@ -27,6 +38,22 @@ const initMap = () => {
         })
     });
 }
+
+// 设置样式
+const customStyle = new Style({
+    stroke: new Stroke({
+        color: 'yellow',
+        width: 10,
+    }),
+    fill: new Fill({
+        color: 'blue'
+    }),
+    image: new CircleStyle({
+        radius: 20,
+        fill: new Fill({ color: 'red' }),
+        stroke: new Stroke({ color: 'green', width: 2 })
+    }),
+})
 
 // 点图层
 const addPointLayer = (map) => {
@@ -39,15 +66,10 @@ const addPointLayer = (map) => {
     });
     const pointLayer = new VectorLayer({
         source: pointSource,
-        style: commonStyle,
+        style: customStyle,
         zIndex: 2
     });
     map.addLayer(pointLayer);
-    map.getView().animate({
-        center: [108.94, 34.34],
-        zoom: 8,
-        duration: 1000
-    })
 }
 
 // 线图层
@@ -64,7 +86,7 @@ const addPolylineLayer = (map) => {
     });
     const lineLayer = new VectorLayer({
         source: lineSource,
-        style: commonStyle,
+        style: customStyle,
         zIndex: 2
     });
     map.addLayer(lineLayer);
@@ -86,13 +108,11 @@ const addPolygonLayer = (map) => {
     const polygonSource = new VectorSource({
         features: [polygonFeature],
     });
-    // 图层
     const polygonLayer = new VectorLayer({
         source: polygonSource,
-        style: commonStyle,
+        style: customStyle,
         zIndex: 2
     });
-    // 向地图上添加图层
     map.addLayer(polygonLayer);
 }
 
@@ -107,11 +127,13 @@ const addCircleLayer = (map) => {
     });
     const circleLayer = new VectorLayer({
         source: circleSource,
-        style: commonStyle,
+        style: customStyle,
         zIndex: 2
     });
     map.addLayer(circleLayer);
 }
+
+
 
 onMounted(() => {
     initMap();
@@ -124,6 +146,7 @@ onMounted(() => {
 </script>
 
 <template>
+
     <div id="map"></div>
 </template>
 

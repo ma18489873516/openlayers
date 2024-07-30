@@ -1,12 +1,23 @@
 <script setup>
 import { Map, View } from "ol";
+import TileLayer from "ol/layer/Tile";
+import XYZ from "ol/source/XYZ";
 import { defaults } from 'ol/interaction';
-import { gaode_vector } from "./hooks/map/layer.js";
+
 import { onMounted } from "vue";
 
 let map
-
 const initMap = () => {
+    const gaodeMap = new TileLayer({
+        id: "gaodeMap",
+        projection: 'EPSG:4326',
+        source: new XYZ({
+            title: "gaodeMap",
+            url: "https://wprd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}",
+            wrapX: true,
+            crossOrigin: "Anonymous",
+        }),
+    });
     const view = new View({
         projection: "EPSG:4326",
         center: [108.945951, 34.465262],
@@ -14,7 +25,7 @@ const initMap = () => {
     });
     map = new Map({
         target: "map",
-        layers: [gaode_vector],
+        layers: [gaodeMap],
         view: view,
         controls: [],
         interactions: defaults({
@@ -24,10 +35,10 @@ const initMap = () => {
 }
 
 // 地图漫游
-const mapRoaming = (map) => {
+const mapRoaming = () => {
     /* 
-            1. 开启地图漫游就添加地图事件
-            2. 取消地图漫游就移除地图事件
+            1. 开启地图漫游就map.on添加地图事件
+            2. 取消地图漫游就map.un移除地图事件
         */
     map.on('click', (event) => {
         // 获取点击位置坐标
@@ -43,7 +54,7 @@ const mapRoaming = (map) => {
 
 onMounted(() => {
     initMap();
-    mapRoaming(map)
+    mapRoaming()
 });
 </script>
 

@@ -1,15 +1,25 @@
 <script setup>
 import { Map, View } from "ol";
+import TileLayer from "ol/layer/Tile";
+import XYZ from "ol/source/XYZ";
 import { defaults } from 'ol/interaction';
-import { gaode_vector } from "./hooks/map/layer.js";
-import { onMounted } from "vue";
-
 // 下载pdf需要安装插件jsPDF：pnpm install jspdf --save
 import { jsPDF } from "jspdf";
 
-let map
+import { onMounted } from "vue";
 
+let map
 const initMap = () => {
+    const gaodeMap = new TileLayer({
+        id: "gaodeMap",
+        projection: 'EPSG:4326',
+        source: new XYZ({
+            title: "gaodeMap",
+            url: "https://wprd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&style=7&x={x}&y={y}&z={z}",
+            wrapX: true,
+            crossOrigin: "Anonymous",
+        }),
+    });
     const view = new View({
         projection: "EPSG:4326",
         center: [108.945951, 34.465262],
@@ -17,7 +27,7 @@ const initMap = () => {
     });
     map = new Map({
         target: "map",
-        layers: [gaode_vector],
+        layers: [gaodeMap],
         view: view,
         controls: [],
         interactions: defaults({
@@ -27,7 +37,7 @@ const initMap = () => {
 }
 
 // 下载视图(image格式)
-const viewImageDownload = (map) => {
+const viewImageDownload = () => {
     map.once('rendercomplete', function () {
         const mapCanvas = document.createElement('canvas');
         const size = map.getSize();
@@ -78,7 +88,7 @@ const viewImageDownload = (map) => {
 }
 
 // 下载视图(pdf格式)
-const viewPdfDownload = (map) => {
+const viewPdfDownload = () => {
     map.once('rendercomplete', () => {
         const mapCanvas = document.createElement('canvas');
         const size = map.getSize();
@@ -127,7 +137,6 @@ const viewPdfDownload = (map) => {
             }
         );
         mapContext.globalAlpha = 1;
-        // 导出地图pdf		   
         const pdf = new jsPDF('landscape', undefined, [width, height]);
         pdf.addImage(
             mapCanvas.toDataURL('image/jpeg'),
@@ -149,9 +158,10 @@ onMounted(() => {
 
 <template>
     <div class="card">
-        <button @click="viewImageDownload(map)">下载视图(image格式)</button>
-        <button @click="viewPdfDownload(map)">下载视图(pdf格式)</button>
+        <button @click="viewImageDownload">下载视图(image格式)</button>
+        <button @click="viewPdfDownload">下载视图(pdf格式)</button>
     </div>
+
     <div id="map"></div>
 
     <!-- 下载：map.png为文件名称 -->
